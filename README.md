@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Virtual Cloth Try-On AI
 
-## Getting Started
+An AI-powered virtual try-on application that allows users to visualize how clothing items would look on their photos. Built with Next.js and integrated with the OOTDiffusion model.
 
-First, run the development server:
+## Features
+
+- Virtual try-on functionality for clothing items
+- Support for different clothing categories
+- Customizable generation parameters
+- Real-time image processing
+- Error handling and retry mechanisms
+
+## Tech Stack
+
+- **Frontend**: Next.js, React
+- **Backend**: Next.js API Routes
+- **AI Model**: OOTDiffusion via Gradio Client
+- **Deployment**: Vercel
+
+## Prerequisites
+
+Before you begin, ensure you have installed:
+- Node.js (version 16 or higher)
+- npm or yarn package manager
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/virtual-cloth-try-on-ai.git
+cd virtual-cloth-try-on-ai
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Create a `.env.local` file in the root directory and add your Hugging Face token:
+```env
+HUGGING_FACE_TOKEN=your_token_here
+```
+
+## Running the Application
+
+Start the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application is configured for deployment on Vercel. Important notes:
 
-## Learn More
+- The serverless function timeout is set to 60 seconds (Vercel hobby plan limitation)
+- Ensure all environment variables are properly set in your Vercel project settings
 
-To learn more about Next.js, take a look at the following resources:
+To deploy:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+vercel --prod
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usage Limitations
 
-## Deploy on Vercel
+- Maximum processing time: 60 seconds per request
+- Image size and format requirements: [Add specific requirements]
+- API rate limits: [Add rate limit details]
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Author
+
+- Ali Hamza Kamboh ([@ahkamboh](https://github.com/ahkamboh))
+
+## License
+
+MIT License
+
+
+## Hugging Face Model
+
+- OOTDiffusion model by [ahkamboh](https://huggingface.co/spaces/ahkamboh/Change-cloth-AI)
+
+- Next.js framework by Vercel
