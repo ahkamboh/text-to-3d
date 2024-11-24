@@ -4,7 +4,7 @@ interface TrialData {
 }
 
 export function useTrialLimit() {
-  const DAILY_LIMIT = 1;
+  const DAILY_LIMIT = 4;
   const STORAGE_KEY = 'cloth_ai_trial';
 
   const getTrialData = (): TrialData => {
