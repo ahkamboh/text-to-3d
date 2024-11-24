@@ -1,46 +1,22 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Download, Upload, ImageIcon, Wand2 } from 'lucide-react'
+import { Wand2, Download } from 'lucide-react'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import Image from 'next/image'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Progress } from "@/components/ui/progress"
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import { useTrialLimit } from '@/hooks/useTrialLimit';
+import { useTrialLimit } from '@/hooks/useTrialLimit'
 
 export default function Home() {
-  const [modelImage, setModelImage] = useState<File | null>(null)
-  const [modelPreview, setModelPreview] = useState<string | null>(null)
-  const [garmentImage, setGarmentImage] = useState<File | null>(null)
-  const [garmentPreview, setGarmentPreview] = useState<string | null>(null)
-  const [nSamples, setNSamples] = useState(1)
-  const [nSteps, setNSteps] = useState(20)
-  const [imageScale, setImageScale] = useState(2)
-  const [seed, setSeed] = useState(-1)
-  const [result, setResult] = useState<string | null>(null)
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState<{url: string} | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isClient, setIsClient] = useState(false)
-  const [category, setCategory] = useState<string>('none')
-  const [quotaError, setQuotaError] = useState<string | null>(null)
   const { getTrialData, updateTrialData, getTimeUntilReset } = useTrialLimit();
   const [trialInfo, setTrialInfo] = useState({ triesLeft: 1, timeUntilReset: '' });
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   useEffect(() => {
     const updateTrialInfo = () => {
@@ -56,23 +32,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'model' | 'garment') => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (type === 'model') {
-          setModelImage(file)
-          setModelPreview(reader.result as string)
-        } else {
-          setGarmentImage(file)
-          setGarmentPreview(reader.result as string)
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -86,316 +45,161 @@ export default function Home() {
     setError(null)
     setResult(null)
 
-    const formData = new FormData()
-    if (modelImage) formData.append('modelImage', modelImage)
-    if (garmentImage) formData.append('garmentImage', garmentImage)
-    if (category !== 'none') formData.append('category', category)
-    formData.append('nSamples', nSamples.toString())
-    formData.append('nSteps', nSteps.toString())
-    formData.append('imageScale', imageScale.toString())
-    formData.append('seed', seed.toString())
-
     try {
-      const response = await fetch('/api/generate-outfit', {
+      const response = await fetch('/api/generate-memoji', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input }),
       })
 
       const data = await response.json()
-
-      if (response.status === 429) {
-        setQuotaError(data.error)
-        return
-      }
-
       if (!response.ok) {
-        throw new Error(data.error || `Failed to generate outfit: ${response.status} ${response.statusText}`)
+        throw new Error(data.error || 'Failed to generate avatar')
       }
 
-      if (!data.success || !data.result) {
-        throw new Error('No result received from the server')
-      }
-
-      const imageData = data.result
-      if (typeof imageData !== 'string' || (!imageData.startsWith('data:image') && !imageData.startsWith('http'))) {
-        throw new Error('Invalid image data received')
-      }
-
-      setResult(imageData)
-      updateTrialData();
+      setResult(data.result)
+      updateTrialData(); // Update trial count after successful generation
     } catch (err) {
-      console.error('Error in handleSubmit:', err)
-      if (err instanceof Error) {
-        setError(`Error: ${err.message}`)
-      } else {
-        setError('An unexpected error occurred while generating the outfit')
-      }
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDownload = async () => {
-    if (!result) return
+    if (!result?.url) return;
 
     try {
-      const response = await fetch(result)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `generated-outfit-${Date.now()}.webp`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      const response = await fetch(result.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `avatar-${Date.now()}.png`; // Unique filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Error downloading image:', err)
-      setError('Failed to download the image')
+      setError('Failed to download avatar');
     }
-  }
-
-  if (!isClient) {
-    return null
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white overflow-hidden relative">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+      
       <Navbar />
       
-      <div className="w-full border-b border-gray-800 bg-[#020817]">
+      <div className="w-full border-b border-gray-800 bg-black/50 backdrop-blur-sm relative z-10">
         <div className="container max-w-6xl mx-auto px-4 py-2">
           <p className="text-center text-sm text-gray-400">
-            Token left: {trialInfo.triesLeft} | Resets in: {trialInfo.timeUntilReset}
+            Tries left: {trialInfo.triesLeft} | Resets in: {trialInfo.timeUntilReset}
           </p>
         </div>
       </div>
-
-      <div className="container max-w-6xl mx-auto px-4 py-16">
+      
+      <div className="container max-w-6xl mx-auto px-4 py-16 relative z-10">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
-            Virtual Try-On Experience
+          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+            Avatar Generator
           </h1>
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <span className="text-4xl font-bold text-[#3B82F6]">using AI</span>
-            <span className="text-4xl font-bold">for everyone.</span>
-          </div>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Take a picture of yourself and instantly try on any clothing item. 
-            See how different garments look on you before making a purchase!
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg">
+            Create stunning Avatar  responses with AI magic ✨
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card >
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg shadow-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-white">Try On Clothes</CardTitle>
-              <CardDescription className="text-gray-400">
-                Upload your photo and the garment you want to try
+              <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
+                Generate Avatar
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Enter your text to conjure an avatar response
               </CardDescription>
               <div className="mt-2 text-sm">
                 {trialInfo.triesLeft === 0 ? (
-                  <div className="text-yellow-500 bg-yellow-500/10 px-3 py-2 rounded-md">
+                  <div className="text-yellow-300 bg-yellow-500/10 px-3 py-2 rounded-md">
                     Next try available in {trialInfo.timeUntilReset}
                   </div>
                 ) : (
-                  <div className="text-blue-500 bg-blue-500/10 px-3 py-2 rounded-md">
-                    {trialInfo.triesLeft} try remaining today
+                  <div className="text-blue-300 bg-blue-500/10 px-3 py-2 rounded-md">
+                    {trialInfo.triesLeft} {trialInfo.triesLeft === 1 ? 'try' : 'tries'} remaining today
                   </div>
                 )}
               </div>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="modelImage">Model Image</Label>
-                    <div className="mt-2 space-y-2">
-                      <div className="border-2 border-dashed rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <Input
-                          id="modelImage"
-                          type="file"
-                          onChange={(e) => handleImageChange(e, 'model')}
-                          className="hidden"
-                          required
-                        />
-                        <label htmlFor="modelImage" className="flex flex-col items-center cursor-pointer">
-                          {modelPreview ? (
-                            <Image
-                              src={modelPreview}
-                              alt="Model preview"
-                              width={200}
-                              height={200}
-                              className="rounded-lg object-cover"
-                            />
-                          ) : (
-                            <>
-                              <Upload className="h-12 w-12 text-gray-400" />
-                              <span className="mt-2 text-sm text-gray-500">Upload model image</span>
-                            </>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="garmentImage">Garment Image</Label>
-                    <div className="mt-2 space-y-2">
-                      <div className="border-2 border-dashed rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <Input
-                          id="garmentImage"
-                          type="file"
-                          onChange={(e) => handleImageChange(e, 'garment')}
-                          className="hidden"
-                          required
-                        />
-                        <label htmlFor="garmentImage" className="flex flex-col items-center cursor-pointer">
-                          {garmentPreview ? (
-                            <Image
-                              src={garmentPreview}
-                              alt="Garment preview"
-                              width={200}
-                              height={200}
-                              className="rounded-lg object-cover"
-                            />
-                          ) : (
-                            <>
-                              <ImageIcon className="h-12 w-12 text-gray-400" />
-                              <span className="mt-2 text-sm text-gray-500">Upload garment image</span>
-                            </>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <Label htmlFor="input" className="text-gray-300">Your Magical Message</Label>
+                  <Input
+                    id="input"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Enter your message..."
+                    className="mt-2 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="category">Garment Category</Label>
-                    <Select value={category} onValueChange={setCategory}>
-                      <SelectTrigger className="w-full mt-1">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None (HD Processing)</SelectItem>
-                        <SelectItem value="Upper-body">Upper Body</SelectItem>
-                        <SelectItem value="Lower-body">Lower Body</SelectItem>
-                        <SelectItem value="Dress">Dress</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="nSamples">Number of Samples: {nSamples}</Label>
-                    <Slider
-                      id="nSamples"
-                      min={1}
-                      max={4}
-                      step={1}
-                      value={[nSamples]}
-                      onValueChange={(value) => setNSamples(value[0])}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="nSteps">Steps: {nSteps}</Label>
-                    <Slider
-                      id="nSteps"
-                      min={1}
-                      max={50}
-                      step={1}
-                      value={[nSteps]}
-                      onValueChange={(value) => setNSteps(value[0])}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="imageScale">Guidance Scale: {imageScale.toFixed(1)}</Label>
-                    <Slider
-                      id="imageScale"
-                      min={0.1}
-                      max={20}
-                      step={0.1}
-                      value={[imageScale]}
-                      onValueChange={(value) => setImageScale(value[0])}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="seed">Random Seed</Label>
-                    <Input
-                      id="seed"
-                      type="number"
-                      value={seed}
-                      onChange={(e) => setSeed(parseInt(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Button 
-                    type="submit" 
-                    disabled={loading || trialInfo.triesLeft === 0} 
-                    className="w-full bg-black hover:bg-black/80 text-white border-none rounded-md"
-                  >
-                    {loading ? (
-                      <div className="flex items-center justify-center">
-                        <Wand2 className="mr-2 h-4 w-4 animate-spin text-[#3B82F6]" />
-                        <span className="text-[#3B82F6]">Generating...</span>
-                      </div>
-                    ) : trialInfo.triesLeft === 0 ? (
-                      <div className="flex items-center justify-center">
-                        <span className="text-gray-400">Try again in {trialInfo.timeUntilReset}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center">
-                        <Wand2 className="mr-2 h-4 w-4 text-[#3B82F6]" />
-                        <span className="text-white">Generate Outfit</span>
-                      </div>
-                    )}
-                  </Button>
-                  {trialInfo.triesLeft === 1 && (
-                    <p className="text-xs text-center text-gray-400">
-                      This is your last try for today
-                    </p>
+                <Button 
+                  type="submit" 
+                  disabled={loading || !input || trialInfo.triesLeft === 0} 
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <Wand2 className="mr-2 h-5 w-5 animate-spin text-yellow-300" />
+                      <span className="text-yellow-300">Conjuring...</span>
+                    </div>
+                  ) : trialInfo.triesLeft === 0 ? (
+                    <div className="flex items-center justify-center">
+                      <span className="text-gray-400">Try again in {trialInfo.timeUntilReset}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <Wand2 className="mr-2 h-5 w-5 text-yellow-300" />
+                      <span>Generate Avatar</span>
+                    </div>
                   )}
-                </div>
+                </Button>
+                {trialInfo.triesLeft === 1 && (
+                  <p className="text-xs text-center text-gray-400">
+                    This is your last try for today
+                  </p>
+                )}
               </form>
             </CardContent>
           </Card>
 
-          <Card className='animate-shimmer'>
+          <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg shadow-blue-500/20 overflow-hidden">
             <CardHeader>
-              <CardTitle>Virtual Mirror</CardTitle>
-              <CardDescription>See how the garment looks on you</CardDescription>
+              <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-blue-600">Avatar Response</CardTitle>
+              <CardDescription className="text-gray-300">Your magical creation will appear here</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               {loading && (
-                <div className="space-y-4 text-center p-8">
-                  <Progress value={45} className="w-full" />
-                  <p className="text-sm text-gray-500">Processing your request...</p>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
+                  <div className="text-center p-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+                    <p className="mt-2 text-sm text-purple-300">Casting the spell...</p>
+                  </div>
                 </div>
               )}
 
               {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg">
-                  <p className="font-medium">Error</p>
+                <div className="p-4 bg-red-500/20 border border-red-500/50 text-red-300 rounded-lg">
                   <p className="text-sm">{error}</p>
                 </div>
               )}
 
               {result && (
-                <div className="space-y-4">
-                  <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <div className="p-4 border border-white/20 rounded-lg overflow-hidden space-y-4">
+                  <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20">
                     <Image
-                      src={result}
-                      alt="Generated Outfit"
+                      src={result.url}
+                      alt="Generated Avatar"
                       fill
                       className="object-contain"
                       unoptimized
@@ -403,18 +207,22 @@ export default function Home() {
                   </div>
                   <Button
                     onClick={handleDownload}
-                    className="w-full"
-                    variant="outline"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
                   >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Image
+                    <div className="flex items-center justify-center">
+                      <Download className="mr-2 h-5 w-5" />
+                      <span>Download Avatar</span>
+                    </div>
                   </Button>
                 </div>
               )}
 
               {!loading && !error && !result && (
-                <div className="h-[400px] flex items-center justify-center text-gray-400 border-2 border-dashed rounded-lg">
-                  <p>Generated image will appear here</p>
+                <div className="h-[400px] flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-500/50 rounded-lg bg-gradient-to-br from-purple-500/5 to-blue-500/5">
+                  <p className="text-center">
+                    <span className="block text-3xl mb-2">✨</span>
+                        Your magical avatar will appear here
+                  </p>
                 </div>
               )}
             </CardContent>
