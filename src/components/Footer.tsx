@@ -3,7 +3,7 @@ import { Github, Linkedin, Mail } from 'lucide-react'
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-800 bg-[#0A0A0B]">
+    <footer className="bg-white/5 backdrop-blur-md border-t border-white/10 py-6 mt-12">
       <div className="container mx-auto px-4 py-6">
         <div className="flex sm:flex-row flex-col justify-between items-center gap-4">
           {/* Main Row */}
@@ -35,7 +35,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-[#3B82F6]">
-            © {new Date().getFullYear()} Cloth AI Changer
+            © {new Date().getFullYear()} Avatar AI
           </p>
         </div>
       </div>

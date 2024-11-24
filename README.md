@@ -1,34 +1,35 @@
-# Virtual Cloth Try-On AI
+# AI Avatar Generator
 
-An AI-powered virtual try-on application that allows users to visualize how clothing items would look on their photos. Built with Next.js and integrated with the OOTDiffusion model.
+A magical AI-powered avatar generator that transforms text descriptions into stunning, personalized digital avatars. Built with Next.js and integrated with advanced AI models.
 
-## Features
+## ✨ Features
 
-- Virtual try-on functionality for clothing items
-- Support for different clothing categories
-- Customizable generation parameters
-- Real-time image processing
+- Text-to-avatar generation
+- Magical UI/UX design
+- Daily generation limits (4 per day)
+- One-click avatar downloads
+- Real-time generation status
 - Error handling and retry mechanisms
 
-## Tech Stack
+## 🚀 Tech Stack
 
-- **Frontend**: Next.js, React
-- **Backend**: Next.js API Routes
-- **AI Model**: OOTDiffusion via Gradio Client
+- **Frontend**: Next.js 14, React, TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI
+- **AI Integration**: Gradio Client
 - **Deployment**: Vercel
 
-## Prerequisites
+## 🛠️ Prerequisites
 
-Before you begin, ensure you have installed:
-- Node.js (version 16 or higher)
+Before you begin, ensure you have:
+- Node.js (version 18 or higher)
 - npm or yarn package manager
 
-## Installation
+## 📦 Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/virtual-cloth-try-on-ai.git
-cd virtual-cloth-try-on-ai
+git clone https://github.com/ahkamboh/avatar-generator.git
+cd avatar-generator
 ```
 
 2. Install dependencies:
@@ -38,12 +39,12 @@ npm install
 yarn install
 ```
 
-3. Create a `.env.local` file in the root directory and add your Hugging Face token:
+3. Create a `.env.local` file:
 ```env
-HUGGING_FACE_TOKEN=your_token_here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## Running the Application
+## 🏃‍♂️ Running the Application
 
 Start the development server:
 
@@ -53,42 +54,47 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Deployment
+## 🌟 Usage
 
-The application is configured for deployment on Vercel. Important notes:
+1. Enter your text description
+2. Click "Generate Avatar"
+3. Wait for the magical generation process
+4. Download your avatar with one click
 
-- The serverless function timeout is set to 60 seconds (Vercel hobby plan limitation)
-- Ensure all environment variables are properly set in your Vercel project settings
+## ⚡ Usage Limits
 
-To deploy:
+- 4 avatar generations per day per user
+- Resets at midnight local time
+- Maximum processing time: 30 seconds per generation
 
-```bash
-vercel --prod
-```
+## 🎨 Features in Detail
 
-## Usage Limitations
+- **Text-to-Avatar**: Transform text descriptions into unique avatars
+- **Daily Limits**: Fair usage system with 4 generations per day
+- **Download Options**: Easy download of generated avatars
+- **Responsive Design**: Works on all devices
+- **Real-time Status**: Live generation progress updates
 
-- Maximum processing time: 60 seconds per request
-- Image size and format requirements: [Add specific requirements]
-- API rate limits: [Add rate limit details]
-
-## Contributing
+## 👥 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Author
+## 👨‍💻 Author
 
 - Ali Hamza Kamboh ([@ahkamboh](https://github.com/ahkamboh))
 
-## License
+## 📄 License
 
 MIT License
 
-
-## Hugging Face Model
-
-- OOTDiffusion model by [ahkamboh](https://huggingface.co/spaces/ahkamboh/Change-cloth-AI)
+## 🙏 Acknowledgments
 
 - Next.js framework by Vercel
+- Shadcn UI for components
+- Apple Memoji model integration
+
+---
+
+Made with ❤️ by Ali Hamza Kamboh

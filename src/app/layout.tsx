@@ -14,9 +14,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI Cloth Changer - Virtual Try-On Experience",
-  description: "Experience virtual try-on powered by AI. Upload your photo and instantly see how different garments look on you. Transform your shopping experience with our advanced AI technology.",
-  keywords: "AI cloth changer, virtual try-on, AI fashion, digital fitting room, virtual mirror, AI clothing, fashion technology, virtual clothing try-on",
+  title: "AI Avatar Generator - Create Magical Avatars",
+  description: "Create stunning AI-generated avatars with our magical avatar generator. Transform your text descriptions into unique, personalized digital avatars.",
+  keywords: "AI avatar generator, digital avatars, AI art, personalized avatars, avatar creation, AI generation, custom avatars",
   authors: [{ name: "Ali Hamza Kamboh", url: "https://alihamzakamboh.com" }],
   creator: "Ali Hamza Kamboh",
   publisher: "Ali Hamza Kamboh",
@@ -24,27 +24,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ai-cloth-changer.vercel.app",
-    title: "AI Cloth Changer - Virtual Try-On Experience",
-    description: "Transform your shopping experience with AI-powered virtual try-on technology.",
-    siteName: "AI Cloth Changer",
+    url: "https://avatar-generator.vercel.app",
+    title: "AI Avatar Generator - Create Magical Avatars",
+    description: "Transform your ideas into stunning AI-generated avatars with our magical generator.",
+    siteName: "AI Avatar Generator",
     images: [{
-      url: "/og-image.png", // Make sure to add this image to your public folder
+      url: "/og-image.png",
       width: 1200,
       height: 630,
-      alt: "AI Cloth Changer Preview"
+      alt: "AI Avatar Generator Preview"
     }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Cloth Changer - Virtual Try-On Experience",
-    description: "Transform your shopping experience with AI-powered virtual try-on technology.",
+    title: "AI Avatar Generator - Create Magical Avatars",
+    description: "Transform your ideas into stunning AI-generated avatars with our magical generator.",
     creator: "@ahkamboh",
-    images: ["/og-image.png"], // Same image as OpenGraph
+    images: ["/og-image.png"],
   },
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   themeColor: "#020817",
-  manifest: "/manifest.json", // If you want to make your app installable (PWA)
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -57,7 +57,6 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        {/* Safe area for iOS devices */}
         <meta name="theme-color" content="#020817" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
