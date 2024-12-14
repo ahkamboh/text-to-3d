@@ -10,13 +10,24 @@ import Footer from '@/components/Footer'
 import Image from 'next/image'
 import { useTrialLimit } from '@/hooks/useTrialLimit'
 
+interface GeneratedResult {
+  url: string;
+}
+
 export default function Home() {
   const [input, setInput] = useState('')
-  const [result, setResult] = useState<{url: string} | null>(null)
+  const [result, setResult] = useState<GeneratedResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { getTrialData, updateTrialData, getTimeUntilReset } = useTrialLimit();
   const [trialInfo, setTrialInfo] = useState({ triesLeft: 1, timeUntilReset: '' });
+  const [settings, setSettings] = useState({
+    height: 1024,
+    width: 1024,
+    steps: 8,
+    scales: 3.5,
+    seed: 663103
+  });
 
   useEffect(() => {
     const updateTrialInfo = () => {
@@ -33,38 +44,39 @@ export default function Home() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const trialData = getTrialData();
-    if (trialData.triesLeft <= 0) {
-      setError(`Daily limit reached. Next try available in ${getTimeUntilReset()}`);
-      return;
-    }
-
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/generate-memoji', {
+      const response = await fetch('/api/3d-gen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input }),
-      })
+        body: JSON.stringify({ 
+          prompt: input,
+          ...settings
+        }),
+      });
 
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate avatar')
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to generate image');
       }
 
-      setResult(data.result)
-      updateTrialData(); // Update trial count after successful generation
+      if (!data.result?.url || typeof data.result.url !== 'string') {
+        throw new Error('Invalid image URL received');
+      }
+
+      setResult(data.result);
+      updateTrialData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDownload = async () => {
     if (!result?.url) return;
@@ -102,10 +114,10 @@ export default function Home() {
       <div className="container max-w-6xl mx-auto px-4 py-16 relative z-10">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-            Avatar Generator
+            Text to 3D 
           </h1>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-            Create stunning Avatar  responses with AI magic ✨
+            Transform your text into stunning 3D artistic creations ✨
           </p>
         </div>
 
@@ -113,10 +125,10 @@ export default function Home() {
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg shadow-purple-500/20">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-                Generate Avatar
+                Create 3D Text
               </CardTitle>
               <CardDescription className="text-gray-300">
-                Enter your text to conjure an avatar response
+                Enter your text to transform it into a 3D masterpiece
               </CardDescription>
               <div className="mt-2 text-sm">
                 {trialInfo.triesLeft === 0 ? (
@@ -133,50 +145,56 @@ export default function Home() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="input" className="text-gray-300">Your Magical Message</Label>
+                  <Label htmlFor="input" className="text-gray-300">Your Text for 3D Creation</Label>
                   <Input
                     id="input"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Enter your message..."
-                    className="mt-2 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Enter text to transform into 3D..."
+                    className="mt-2 bg-white/5 border-white/10 text-white"
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  disabled={loading || !input || trialInfo.triesLeft === 0} 
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <Wand2 className="mr-2 h-5 w-5 animate-spin text-yellow-300" />
-                      <span className="text-yellow-300">Conjuring...</span>
-                    </div>
-                  ) : trialInfo.triesLeft === 0 ? (
-                    <div className="flex items-center justify-center">
-                      <span className="text-gray-400">Try again in {trialInfo.timeUntilReset}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center">
-                      <Wand2 className="mr-2 h-5 w-5 text-yellow-300" />
-                      <span>Generate Avatar</span>
-                    </div>
-                  )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="height">Height</Label>
+                    <Input
+                      type="range"
+                      id="height"
+                      min="256"
+                      max="1024"
+                      value={settings.height}
+                      onChange={(e) => setSettings(prev => ({ ...prev, height: Number(e.target.value) }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="width">Width</Label>
+                    <Input
+                      type="range"
+                      id="width"
+                      min="256"
+                      max="1024"
+                      value={settings.width}
+                      onChange={(e) => setSettings(prev => ({ ...prev, width: Number(e.target.value) }))}
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" disabled={loading || !input || trialInfo.triesLeft === 0}>
+                  {loading ? "Creating 3D..." : "Generate 3D Text"}
                 </Button>
-                {trialInfo.triesLeft === 1 && (
-                  <p className="text-xs text-center text-gray-400">
-                    This is your last try for today
-                  </p>
-                )}
               </form>
             </CardContent>
           </Card>
 
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg shadow-blue-500/20 overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-blue-600">Avatar Response</CardTitle>
-              <CardDescription className="text-gray-300">Your magical creation will appear here</CardDescription>
+              <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-blue-600">
+                3D Preview
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Your 3D creation will appear here
+              </CardDescription>
             </CardHeader>
             <CardContent className="relative">
               {loading && (
@@ -194,24 +212,26 @@ export default function Home() {
                 </div>
               )}
 
-              {result && (
+              {result && result.url && (
                 <div className="p-4 border border-white/20 rounded-lg overflow-hidden space-y-4">
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20">
-                    <Image
+                    <img
                       src={result.url}
-                      alt="Generated Avatar"
-                      fill
-                      className="object-contain"
-                      unoptimized
+                      alt="Generated 3D Text"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        console.error('Image failed to load:', result.url);
+                        setError('Failed to load generated image');
+                      }}
                     />
                   </div>
                   <Button
                     onClick={handleDownload}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                   >
                     <div className="flex items-center justify-center">
                       <Download className="mr-2 h-5 w-5" />
-                      <span>Download Avatar</span>
+                      <span>Download Image</span>
                     </div>
                   </Button>
                 </div>
