@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Github } from 'lucide-react'
+
 
 export default function Navbar() {
   return (
@@ -15,7 +15,7 @@ export default function Navbar() {
               height={32}
               className="w-10 h-10"
             />
-            <span className="text-xl font-bold text-white">Avatar AI™</span>
+            <span className="text-xl font-bold text-white">Text to 3D™</span>
           </Link>
           
           <div className="flex items-center gap-4">

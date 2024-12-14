@@ -35,7 +35,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-[#3B82F6]">
-            © {new Date().getFullYear()} Avatar AI
+            © {new Date().getFullYear()} Text to 3D
           </p>
         </div>
       </div>
