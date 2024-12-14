@@ -14,9 +14,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI Avatar Generator - Create Magical Avatars",
-  description: "Create stunning AI-generated avatars with our magical avatar generator. Transform your text descriptions into unique, personalized digital avatars.",
-  keywords: "AI avatar generator, digital avatars, AI art, personalized avatars, avatar creation, AI generation, custom avatars",
+  title: "Text to 3D - Create Magical 3D Scenes",
+  description: "Transform your text descriptions into stunning 3D scenes with our magical AI-powered generator. Create unique, three-dimensional artwork from simple text prompts.",
+  keywords: "text to 3D, 3D generation, AI art, 3D scenes, 3D creation, AI generation, custom 3D, text-to-3D",
   authors: [{ name: "Ali Hamza Kamboh", url: "https://alihamzakamboh.com" }],
   creator: "Ali Hamza Kamboh",
   publisher: "Ali Hamza Kamboh",
@@ -24,21 +24,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://avatar-generator.vercel.app",
-    title: "AI Avatar Generator - Create Magical Avatars",
-    description: "Transform your ideas into stunning AI-generated avatars with our magical generator.",
-    siteName: "AI Avatar Generator",
+    url: "https://text-to-3d-wine.vercel.app/",
+    title: "Text to 3D - Create Magical 3D Scenes",
+    description: "Transform your ideas into stunning AI-generated 3D scenes with our magical generator.",
+    siteName: "Text to 3D",
     images: [{
       url: "/og-image.png",
       width: 1200,
       height: 630,
-      alt: "AI Avatar Generator Preview"
+      alt: "Text to 3D Generator Preview"
     }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Avatar Generator - Create Magical Avatars",
-    description: "Transform your ideas into stunning AI-generated avatars with our magical generator.",
+    title: "Text to 3D - Create Magical 3D Scenes",
+    description: "Transform your ideas into stunning AI-generated 3D scenes with our magical generator.",
     creator: "@ahkamboh",
     images: ["/og-image.png"],
   },
