@@ -1,13 +1,20 @@
-# AI Avatar Generator
+# Text to 3D
 
-A magical AI-powered avatar generator that transforms text descriptions into stunning, personalized digital avatars. Built with Next.js and integrated with advanced AI models.
+A magical AI-powered 3D scene generator that transforms text descriptions into stunning, three-dimensional creations. Built with Next.js and integrated with advanced AI models.
+
+### Pakistani Boy in Shalwar Kameez
+
+Prompt: "Generate a 3D model of a young Pakistani boy wearing traditional white shalwar kameez"
+
+![Pakistani Boy in Traditional Dress](https://ginipick-text3d.hf.space/gradio_api/file=/tmp/gradio/c02849e4f0463e7821b30bc3e0a597d026982ad0fde00159204ed89288ef4340/image.webp)
+
 
 ## ✨ Features
 
-- Text-to-avatar generation
+- Text-to-3D generation
 - Magical UI/UX design
 - Daily generation limits (4 per day)
-- One-click avatar downloads
+- One-click 3D downloads
 - Real-time generation status
 - Error handling and retry mechanisms
 
@@ -93,7 +100,6 @@ MIT License
 
 - Next.js framework by Vercel
 - Shadcn UI for components
-- Apple Memoji model integration
 
 ---
 
