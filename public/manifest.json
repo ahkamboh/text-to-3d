@@ -1,7 +1,7 @@
 {
-  "name": "AI Avatar Generator",
-  "short_name": "Avatar AI",
-  "description": "Create magical AI-generated avatars from text descriptions",
+  "name": "Text to 3D",
+  "short_name": "3D AI",
+  "description": "Transform your text into stunning 3D artistic creations",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020817",
