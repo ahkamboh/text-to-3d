@@ -4,9 +4,9 @@ A magical AI-powered 3D scene generator that transforms text descriptions into s
 
 ### Pakistani Boy in Shalwar Kameez
 
-Prompt: "Generate a 3D model of a young Pakistani boy wearing traditional white shalwar kameez"
+Prompt: "Generate a 3D model of a young Pakistani boy "
 
-![Pakistani Boy in Traditional Dress](https://ginipick-text3d.hf.space/gradio_api/file=/tmp/gradio/c02849e4f0463e7821b30bc3e0a597d026982ad0fde00159204ed89288ef4340/image.webp)
+![Pakistani Boy in Traditional Dress](https://ginipick-text3d.hf.space/gradio_api/file=/tmp/gradio/c1e116068d2f2e3b8d4511b933ed691d49e010032d6e5814bb3af776a69af3d8/image.webp)
 
 
 ## ✨ Features
